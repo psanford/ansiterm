@@ -98,6 +98,9 @@ func (ap *AnsiParser) csiDispatch() error {
 		ints := getInts(params, 2, 1)
 		top, bottom := ints[0], ints[1]
 		return ap.eventHandler.DECSTBM(top, bottom)
+
+	case "~":
+		return ap.eventHandler.DCH(1)
 	default:
 		ap.logf("ERROR: Unsupported CSI command: '%s', with full context:  %v", cmd, ap.context)
 		return nil
