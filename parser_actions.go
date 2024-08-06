@@ -1,5 +1,7 @@
 package ansiterm
 
+import "strconv"
+
 func (ap *AnsiParser) collectParam() error {
 	currChar := ap.context.currentChar
 	ap.logf("collectParam %#x", currChar)
@@ -100,7 +102,13 @@ func (ap *AnsiParser) csiDispatch() error {
 		return ap.eventHandler.DECSTBM(top, bottom)
 
 	case "~":
-		return ap.eventHandler.DCH(1)
+		ints := getInts(params, 1, 0)
+		if ints[0] == 3 {
+			return ap.eventHandler.DCH(1)
+		} else {
+			return ap.eventHandler.DA([]string{"CSI", "~", strconv.Itoa(ints[0])})
+		}
+
 	default:
 		ap.logf("ERROR: Unsupported CSI command: '%s', with full context:  %v", cmd, ap.context)
 		return nil
