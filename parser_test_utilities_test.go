@@ -6,7 +6,7 @@ import (
 
 func createTestParser(s string) (*AnsiParser, *TestAnsiEventHandler) {
 	evtHandler := CreateTestAnsiEventHandler()
-	parser := CreateParser(s, evtHandler)
+	parser := CreateParser(evtHandler, WithInitialState(s))
 
 	return parser, evtHandler
 }

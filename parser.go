@@ -18,7 +18,8 @@ type AnsiParser struct {
 	oscString          state
 	stateMap           []state
 
-	logf func(string, ...interface{})
+	initialState string
+	logf         func(string, ...interface{})
 }
 
 type Option func(*AnsiParser)
@@ -29,10 +30,17 @@ func WithLogf(f func(string, ...interface{})) Option {
 	}
 }
 
-func CreateParser(initialState string, evtHandler AnsiEventHandler, opts ...Option) *AnsiParser {
+func WithInitialState(s string) Option {
+	return func(ap *AnsiParser) {
+		ap.initialState = s
+	}
+}
+
+func CreateParser(evtHandler AnsiEventHandler, opts ...Option) *AnsiParser {
 	ap := &AnsiParser{
 		eventHandler: evtHandler,
 		context:      &ansiContext{},
+		initialState: "Ground",
 	}
 	for _, o := range opts {
 		o(ap)
@@ -62,7 +70,7 @@ func CreateParser(initialState string, evtHandler AnsiEventHandler, opts ...Opti
 		ap.oscString,
 	}
 
-	ap.currState = getState(initialState, ap.stateMap)
+	ap.currState = getState(ap.initialState, ap.stateMap)
 
 	ap.logf("CreateParser: parser %p", ap)
 	return ap
