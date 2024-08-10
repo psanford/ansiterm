@@ -1,4 +1,4 @@
-module github.com/psanford/go-ansiterm
+module github.com/psanford/ansiterm
 
 go 1.16
 
