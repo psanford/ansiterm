@@ -1,7 +1,5 @@
 package ansiterm
 
-const LogEnv = "DEBUG_TERMINAL"
-
 // ANSI constants
 // References:
 // -- http://www.ecma-international.org/publications/standards/Ecma-048.htm

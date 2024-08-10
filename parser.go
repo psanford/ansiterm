@@ -2,8 +2,6 @@ package ansiterm
 
 import (
 	"errors"
-	"log"
-	"os"
 )
 
 type AnsiParser struct {
@@ -38,20 +36,6 @@ func CreateParser(initialState string, evtHandler AnsiEventHandler, opts ...Opti
 	}
 	for _, o := range opts {
 		o(ap)
-	}
-
-	if isDebugEnv := os.Getenv(LogEnv); isDebugEnv == "1" {
-		logFile, _ := os.Create("ansiParser.log")
-		logger := log.New(logFile, "", log.LstdFlags)
-		if ap.logf != nil {
-			l := ap.logf
-			ap.logf = func(s string, v ...interface{}) {
-				l(s, v...)
-				logger.Printf(s, v...)
-			}
-		} else {
-			ap.logf = logger.Printf
-		}
 	}
 
 	if ap.logf == nil {
