@@ -46,7 +46,6 @@ func validateFuncCalls(t *testing.T, actualCalls []string, expectedCalls []strin
 func fillContext(context *ansiContext) {
 	context.currentChar = 'A'
 	context.paramBuffer = []byte{'C', 'D', 'E'}
-	context.interBuffer = []byte{'F', 'G', 'H'}
 }
 
 func validateEmptyContext(t *testing.T, context *ansiContext) {
@@ -58,9 +57,4 @@ func validateEmptyContext(t *testing.T, context *ansiContext) {
 	if len(context.paramBuffer) != 0 {
 		t.Errorf("Non-empty parameter buffer: %v", context.paramBuffer)
 	}
-
-	if len(context.paramBuffer) != 0 {
-		t.Errorf("Non-empty intermediate buffer: %v", context.interBuffer)
-	}
-
 }

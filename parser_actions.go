@@ -1,6 +1,8 @@
 package ansiterm
 
-import "strconv"
+import (
+	"strconv"
+)
 
 func (ap *AnsiParser) collectParam() error {
 	currChar := ap.context.currentChar
@@ -10,17 +12,13 @@ func (ap *AnsiParser) collectParam() error {
 }
 
 func (ap *AnsiParser) collectInter() error {
-	currChar := ap.context.currentChar
-	ap.logf("collectInter %#x", currChar)
-	ap.context.paramBuffer = append(ap.context.interBuffer, currChar)
+	// TODO Implement DCS intermediate state handling
 	return nil
 }
 
 func (ap *AnsiParser) escDispatch() error {
 	cmd, _ := parseCmd(*ap.context)
-	intermeds := ap.context.interBuffer
 	ap.logf("escDispatch currentChar: %#x", ap.context.currentChar)
-	ap.logf("escDispatch: %v(%v)", cmd, intermeds)
 
 	switch cmd {
 	case "D": // IND
