@@ -36,7 +36,7 @@ func WithInitialState(s string) Option {
 	}
 }
 
-func CreateParser(evtHandler AnsiEventHandler, opts ...Option) *AnsiParser {
+func CreateParserEventHandler(evtHandler AnsiEventHandler, opts ...Option) *AnsiParser {
 	ap := &AnsiParser{
 		eventHandler: evtHandler,
 		context:      &ansiContext{},
