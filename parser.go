@@ -180,7 +180,6 @@ func (ap *AnsiParser) Parse(bytes []byte) (int, error) {
 }
 
 func (ap *AnsiParser) handle(b byte) error {
-	ap.logf("AnsiParser handle: %c %x", b, b)
 	ap.context.CollectCurrentChar(b)
 	newState, err := ap.currState.Handle(b)
 	if err != nil {

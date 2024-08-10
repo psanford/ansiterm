@@ -42,6 +42,6 @@ func (escState escapeState) Transition(s state) error {
 }
 
 func (escState escapeState) Enter() error {
-	escState.parser.clear()
+	escState.parser.context.EnterNested()
 	return nil
 }

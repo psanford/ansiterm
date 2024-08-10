@@ -44,6 +44,6 @@ func (csiState csiEntryState) Transition(s state) error {
 }
 
 func (csiState csiEntryState) Enter() error {
-	csiState.parser.clear()
+	csiState.parser.context.EnterNested()
 	return nil
 }

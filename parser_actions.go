@@ -34,6 +34,11 @@ func (ap *AnsiParser) escDispatch() error {
 			raw: ap.context.Raw(),
 		}
 		ap.emit(e)
+	default:
+		e := &Generic{
+			raw: ap.context.Raw(),
+		}
+		ap.emit(e)
 	}
 
 	return nil
@@ -218,10 +223,16 @@ func (ap *AnsiParser) csiDispatch() error {
 			}
 			ap.emit(e)
 		} else {
-			// Dispatch generic CSI
+			e := &Generic{
+				raw: ap.context.Raw(),
+			}
+			ap.emit(e)
 		}
 	default:
-		ap.logf("ERROR: Unsupported CSI command: '%s', with full context:  %v", cmd, ap.context)
+		e := &Generic{
+			raw: ap.context.Raw(),
+		}
+		ap.emit(e)
 		return nil
 	}
 

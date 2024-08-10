@@ -36,6 +36,8 @@ const (
 	StateDECSTBM ParserState = "decstbm" // Set Top and Bottom Margins
 	StateIND     ParserState = "ind"     // Index
 	StateRI      ParserState = "ri"      // Reverse Index
+
+	StateGeneric ParserState = "generic"
 )
 
 // Print
@@ -430,4 +432,17 @@ func (e *ReverseIndex) Raw() []byte {
 
 func (e *ReverseIndex) ParserState() ParserState {
 	return StateRI
+}
+
+// Generic in an event that we do not have a more specific state for
+type Generic struct {
+	raw []byte
+}
+
+func (e *Generic) Raw() []byte {
+	return e.raw
+}
+
+func (e *Generic) ParserState() ParserState {
+	return StateGeneric
 }
