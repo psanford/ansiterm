@@ -68,19 +68,19 @@ func (ap *AnsiParser) modeDispatch(param string, set bool) error {
 			raw:    ap.context.Raw(),
 			Enable: set,
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	case "?6":
 		e := &OriginMode{
 			raw:    ap.context.Raw(),
 			Enable: set,
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	case "?25":
 		e := &TextCursorEnableMode{
 			raw:    ap.context.Raw(),
 			Enable: set,
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	}
 	return nil
 }

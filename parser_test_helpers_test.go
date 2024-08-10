@@ -3,7 +3,6 @@ package ansiterm
 import (
 	"context"
 	"fmt"
-	"sync/atomic"
 	"testing"
 	"time"
 )
@@ -45,14 +44,12 @@ func funcCallParamHelper(t *testing.T, bytes []byte, start string, expected stri
 	parser, evtHandler := createTestParser(ctx, start)
 	parser.Parse(bytes)
 	validateState(t, parser.currState, expected)
-	t0 := time.Now()
-	for time.Since(t0) < 100*time.Millisecond {
-		c := atomic.LoadUint32(&evtHandler.Count)
-		if c > 0 {
-			break
-		}
-		time.Sleep(10 * time.Millisecond)
+
+	err := evtHandler.waitForNCalls(1, 100*time.Millisecond)
+	if err != nil {
+		t.Fatal(err)
 	}
+
 	validateFuncCalls(t, evtHandler.FunctionCalls, expectedCalls)
 }
 

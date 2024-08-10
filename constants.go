@@ -144,7 +144,7 @@ var lowerCase = getByteRange(0x60, 0x7E)
 // Alphabetics	  40-7E hex  (all of upper and lower case)
 var alphabetics = append(upperCase, lowerCase...)
 
-var printables = getByteRange(0x20, 0x7E)
+var printables = getByteRange(0x20, 0x7F)
 
 var escapeIntermediateToGroundBytes = getByteRange(0x30, 0x7E)
 var escapeToGroundBytes = getEscapeToGroundBytes()

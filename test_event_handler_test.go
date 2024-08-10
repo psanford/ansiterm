@@ -1,9 +1,11 @@
 package ansiterm
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"sync/atomic"
+	"time"
 )
 
 type TestAnsiEventHandler struct {
@@ -15,6 +17,18 @@ func CreateTestAnsiEventHandler() *TestAnsiEventHandler {
 	evtHandler := TestAnsiEventHandler{}
 	evtHandler.FunctionCalls = make([]string, 0)
 	return &evtHandler
+}
+
+func (h *TestAnsiEventHandler) waitForNCalls(callCount int, timeout time.Duration) error {
+	deadline := time.Now().Add(timeout)
+	for time.Now().Before(deadline) {
+		count := atomic.LoadUint32(&h.Count)
+		if int(count) >= callCount {
+			return nil
+		}
+		time.Sleep(1 * time.Millisecond)
+	}
+	return errors.New("waitForNCalls timed out")
 }
 
 func (h *TestAnsiEventHandler) recordCall(call string, params []string) {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 )
 
 func TestStateTransitions(t *testing.T) {
@@ -113,6 +114,11 @@ func TestPrint(t *testing.T) {
 	parser.Parse(printables)
 	validateState(t, parser.currState, "Ground")
 
+	err := evtHandler.waitForNCalls(len(printables), 100*time.Millisecond)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	for i, v := range printables {
 		expectedCall := fmt.Sprintf("Print([%s])", string(v))
 		actualCall := evtHandler.FunctionCalls[i]
@@ -129,6 +135,11 @@ func TestExec(t *testing.T) {
 	execBytes := getExecuteBytes()
 	parser.Parse(execBytes)
 	validateState(t, parser.currState, "Ground")
+
+	err := evtHandler.waitForNCalls(len(execBytes), 100*time.Millisecond)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	for i, v := range execBytes {
 		expectedCall := fmt.Sprintf("Execute([%s])", string(v))

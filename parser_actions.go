@@ -22,18 +22,18 @@ func (ap *AnsiParser) escDispatch() error {
 		e := &Index{
 			raw: ap.context.Raw(),
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	case "E": // NEL, equivalent to CRLF
 		e := &Execute{
 			raw: ap.context.Raw(),
 			B:   []byte("\r\n"),
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	case "M": // RI
 		e := &ReverseIndex{
 			raw: ap.context.Raw(),
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	}
 
 	return nil
@@ -53,56 +53,56 @@ func (ap *AnsiParser) csiDispatch() error {
 			raw: ap.context.Raw(),
 			N:   getInt(params, 1),
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	case "A":
 		// return ap.eventHandler.CUU(getInt(params, 1))
 		e := &CursorUp{
 			raw: ap.context.Raw(),
 			N:   getInt(params, 1),
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	case "B":
 		// return ap.eventHandler.CUD(getInt(params, 1))
 		e := &CursorDown{
 			raw: ap.context.Raw(),
 			N:   getInt(params, 1),
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	case "C":
 		// return ap.eventHandler.CUF(getInt(params, 1))
 		e := &CursorForward{
 			raw: ap.context.Raw(),
 			N:   getInt(params, 1),
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	case "D":
 		// return ap.eventHandler.CUB(getInt(params, 1))
 		e := &CursorBackward{
 			raw: ap.context.Raw(),
 			N:   getInt(params, 1),
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	case "E":
 		// return ap.eventHandler.CNL(getInt(params, 1))
 		e := &CursorNextLine{
 			raw: ap.context.Raw(),
 			N:   getInt(params, 1),
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	case "F":
 		// return ap.eventHandler.CPL(getInt(params, 1))
 		e := &CursorPreviousLine{
 			raw: ap.context.Raw(),
 			N:   getInt(params, 1),
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	case "G":
 		// return ap.eventHandler.CHA(getInt(params, 1))
 		e := &CursorHorizontalAbsolute{
 			raw: ap.context.Raw(),
 			N:   getInt(params, 1),
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	case "H":
 		ints := getInts(params, 2, 1)
 		x, y := ints[0], ints[1]
@@ -112,7 +112,7 @@ func (ap *AnsiParser) csiDispatch() error {
 			Row: y,
 			Col: x,
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	case "J":
 		// param := getEraseParam(params)
 		// return ap.eventHandler.ED(param)
@@ -120,7 +120,7 @@ func (ap *AnsiParser) csiDispatch() error {
 			raw: ap.context.Raw(),
 			N:   getEraseParam(params),
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	case "K":
 		// param := getEraseParam(params)
 		// return ap.eventHandler.EL(param)
@@ -128,56 +128,56 @@ func (ap *AnsiParser) csiDispatch() error {
 			raw: ap.context.Raw(),
 			N:   getEraseParam(params),
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	case "L":
 		// return ap.eventHandler.IL(getInt(params, 1))
 		e := &InsertLine{
 			raw: ap.context.Raw(),
 			N:   getInt(params, 1),
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	case "M":
 		// return ap.eventHandler.DL(getInt(params, 1))
 		e := &DeleteLine{
 			raw: ap.context.Raw(),
 			N:   getInt(params, 1),
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	case "P":
 		// return ap.eventHandler.DCH(getInt(params, 1))
 		e := &DeleteCharacter{
 			raw: ap.context.Raw(),
 			N:   getInt(params, 1),
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	case "S":
 		// return ap.eventHandler.SU(getInt(params, 1))
 		e := &ScrollUp{
 			raw: ap.context.Raw(),
 			N:   getInt(params, 1),
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	case "T":
 		// return ap.eventHandler.SD(getInt(params, 1))
 		e := &ScrollDown{
 			raw: ap.context.Raw(),
 			N:   getInt(params, 1),
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	case "c":
 		// return ap.eventHandler.DA(params)
 		e := &DeviceAttributes{
 			raw:        ap.context.Raw(),
 			Attributes: params,
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	case "d":
 		// return ap.eventHandler.VPA(getInt(params, 1))
 		e := &VerticalLinePositionAbsolute{
 			raw: ap.context.Raw(),
 			N:   getInt(params, 1),
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	case "f":
 		ints := getInts(params, 2, 1)
 		x, y := ints[0], ints[1]
@@ -187,7 +187,7 @@ func (ap *AnsiParser) csiDispatch() error {
 			Row: y,
 			Col: x,
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	case "h":
 		return ap.hDispatch(params)
 	case "l":
@@ -198,7 +198,7 @@ func (ap *AnsiParser) csiDispatch() error {
 			raw:  ap.context.Raw(),
 			Attr: getInts(params, 1, 0),
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	case "r":
 		ints := getInts(params, 2, 1)
 		// top, bottom := ints[0], ints[1]
@@ -208,7 +208,7 @@ func (ap *AnsiParser) csiDispatch() error {
 			Top:    ints[0],
 			Bottom: ints[1],
 		}
-		ap.eventChan <- e
+		ap.emit(e)
 	case "~":
 		ints := getInts(params, 1, 0)
 		if ints[0] == 3 {
@@ -216,11 +216,10 @@ func (ap *AnsiParser) csiDispatch() error {
 				raw: ap.context.Raw(),
 				N:   1,
 			}
-			ap.eventChan <- e
+			ap.emit(e)
 		} else {
-			return ap.eventHandler.DA([]string{"CSI", "~", strconv.Itoa(ints[0])})
+			// Dispatch generic CSI
 		}
-
 	default:
 		ap.logf("ERROR: Unsupported CSI command: '%s', with full context:  %v", cmd, ap.context)
 		return nil
@@ -234,7 +233,7 @@ func (ap *AnsiParser) print() error {
 		raw: ap.context.Raw(),
 		B:   []byte{ap.context.CurrentChar()},
 	}
-	ap.eventChan <- e
+	ap.emit(e)
 	return nil
 }
 
@@ -248,6 +247,11 @@ func (ap *AnsiParser) execute() error {
 		raw: ap.context.Raw(),
 		B:   []byte{ap.context.CurrentChar()},
 	}
-	ap.eventChan <- e
+	ap.emit(e)
 	return nil
+}
+
+func (ap *AnsiParser) emit(e AnsiEvent) {
+	ap.eventChan <- e
+	ap.context.Reset()
 }
