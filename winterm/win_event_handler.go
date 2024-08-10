@@ -1,3 +1,4 @@
+//go:build windows
 // +build windows
 
 package winterm
@@ -8,7 +9,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/Azure/go-ansiterm"
+	"github.com/psanford/go-ansiterm"
 )
 
 type windowsAnsiEventHandler struct {

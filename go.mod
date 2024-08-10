@@ -1,4 +1,4 @@
-module github.com/Azure/go-ansiterm
+module github.com/psanford/go-ansiterm
 
 go 1.16
 
