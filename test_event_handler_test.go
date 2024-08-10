@@ -3,10 +3,12 @@ package ansiterm
 import (
 	"fmt"
 	"strconv"
+	"sync/atomic"
 )
 
 type TestAnsiEventHandler struct {
 	FunctionCalls []string
+	Count         uint32
 }
 
 func CreateTestAnsiEventHandler() *TestAnsiEventHandler {
@@ -18,6 +20,7 @@ func CreateTestAnsiEventHandler() *TestAnsiEventHandler {
 func (h *TestAnsiEventHandler) recordCall(call string, params []string) {
 	s := fmt.Sprintf("%s(%v)", call, params)
 	h.FunctionCalls = append(h.FunctionCalls, s)
+	atomic.AddUint32(&h.Count, 1)
 }
 
 func (h *TestAnsiEventHandler) Print(b byte) error {

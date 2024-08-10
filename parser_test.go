@@ -1,6 +1,7 @@
 package ansiterm
 
 import (
+	"context"
 	"fmt"
 	"testing"
 )
@@ -29,10 +30,12 @@ func TestAnyToX(t *testing.T) {
 }
 
 func TestCollectCsiParams(t *testing.T) {
-	parser, _ := createTestParser("CsiEntry")
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	parser, _ := createTestParser(ctx, "CsiEntry")
 	parser.Parse(csiCollectables)
 
-	buffer := parser.context.paramBuffer
+	buffer := parser.context.ParamBuffer()
 	bufferCount := len(buffer)
 
 	if bufferCount != len(csiCollectables) {
@@ -104,7 +107,9 @@ func TestScroll(t *testing.T) {
 }
 
 func TestPrint(t *testing.T) {
-	parser, evtHandler := createTestParser("Ground")
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	parser, evtHandler := createTestParser(ctx, "Ground")
 	parser.Parse(printables)
 	validateState(t, parser.currState, "Ground")
 
@@ -118,7 +123,9 @@ func TestPrint(t *testing.T) {
 }
 
 func TestExec(t *testing.T) {
-	parser, evtHandler := createTestParser("Ground")
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	parser, evtHandler := createTestParser(ctx, "Ground")
 	execBytes := getExecuteBytes()
 	parser.Parse(execBytes)
 	validateState(t, parser.currState, "Ground")
@@ -133,7 +140,9 @@ func TestExec(t *testing.T) {
 }
 
 func TestClear(t *testing.T) {
-	p, _ := createTestParser("Ground")
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	p, _ := createTestParser(ctx, "Ground")
 	fillContext(p.context)
 	p.clear()
 	validateEmptyContext(t, p.context)

@@ -1,12 +1,17 @@
 package ansiterm
 
 import (
+	"context"
 	"fmt"
+	"sync/atomic"
 	"testing"
+	"time"
 )
 
 func getStateNames() []string {
-	parser, _ := createTestParser("Ground")
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	parser, _ := createTestParser(ctx, "Ground")
 
 	stateNames := []string{}
 	for _, state := range parser.stateMap {
@@ -17,9 +22,11 @@ func getStateNames() []string {
 }
 
 func stateTransitionHelper(t *testing.T, start string, end string, bytes []byte) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	for _, b := range bytes {
 		bytes := []byte{byte(b)}
-		parser, _ := createTestParser(start)
+		parser, _ := createTestParser(ctx, start)
 		parser.Parse(bytes)
 		validateState(t, parser.currState, end)
 	}
@@ -32,9 +39,20 @@ func anyToXHelper(t *testing.T, bytes []byte, expectedState string) {
 }
 
 func funcCallParamHelper(t *testing.T, bytes []byte, start string, expected string, expectedCalls []string) {
-	parser, evtHandler := createTestParser(start)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	parser, evtHandler := createTestParser(ctx, start)
 	parser.Parse(bytes)
 	validateState(t, parser.currState, expected)
+	t0 := time.Now()
+	for time.Since(t0) < 100*time.Millisecond {
+		c := atomic.LoadUint32(&evtHandler.Count)
+		if c > 0 {
+			break
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
 	validateFuncCalls(t, evtHandler.FunctionCalls, expectedCalls)
 }
 
@@ -99,7 +117,9 @@ func scrollHelper(t *testing.T, command byte, funcName string) {
 }
 
 func clearOnStateChangeHelper(t *testing.T, start string, end string, bytes []byte) {
-	p, _ := createTestParser(start)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	p, _ := createTestParser(ctx, start)
 	fillContext(p.context)
 	p.Parse(bytes)
 	validateState(t, p.currState, end)
@@ -107,7 +127,9 @@ func clearOnStateChangeHelper(t *testing.T, start string, end string, bytes []by
 }
 
 func c0Helper(t *testing.T, bytes []byte, expectedState string, expectedCalls []string) {
-	parser, evtHandler := createTestParser("Ground")
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	parser, evtHandler := createTestParser(ctx, "Ground")
 	parser.Parse(bytes)
 	validateState(t, parser.currState, expectedState)
 	validateFuncCalls(t, evtHandler.FunctionCalls, expectedCalls)

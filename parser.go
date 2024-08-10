@@ -1,12 +1,14 @@
 package ansiterm
 
 import (
+	"context"
 	"errors"
 )
 
 type AnsiParser struct {
 	currState          state
 	eventHandler       AnsiEventHandler
+	eventChan          chan<- AnsiEvent
 	context            *ansiContext
 	csiEntry           state
 	csiParam           state
@@ -36,9 +38,90 @@ func WithInitialState(s string) Option {
 	}
 }
 
-func CreateParserEventHandler(evtHandler AnsiEventHandler, opts ...Option) *AnsiParser {
+func CreateParserEventHandler(ctx context.Context, evtHandler AnsiEventHandler, opts ...Option) *AnsiParser {
+	eventChan := make(chan AnsiEvent)
+	ap := CreateParser(eventChan, opts...)
+	go func() {
+		for {
+			var evt AnsiEvent
+			select {
+			case evt = <-eventChan:
+			case <-ctx.Done():
+				return
+			}
+
+			switch e := evt.(type) {
+			case *Print:
+				evtHandler.Print(e.B[0])
+			case *Execute:
+				evtHandler.Execute(e.B[0])
+			case *CursorUp:
+				evtHandler.CUU(e.N)
+			case *CursorDown:
+				evtHandler.CUD(e.N)
+			case *CursorForward:
+				evtHandler.CUF(e.N)
+			case *CursorBackward:
+				evtHandler.CUB(e.N)
+			case *CursorNextLine:
+				evtHandler.CNL(e.N)
+			case *CursorPreviousLine:
+				evtHandler.CPL(e.N)
+			case *CursorHorizontalAbsolute:
+				evtHandler.CHA(e.N)
+			case *VerticalLinePositionAbsolute:
+				evtHandler.VPA(e.N)
+			case *CursorPosition:
+				evtHandler.CUP(e.Col, e.Row)
+			case *HorizontalVerticalPosition:
+				evtHandler.HVP(e.Col, e.Row)
+			case *TextCursorEnableMode:
+				evtHandler.DECTCEM(e.Enable)
+			case *OriginMode:
+				evtHandler.DECOM(e.Enable)
+			case *ColumnMode:
+				evtHandler.DECCOLM(e.Enable)
+			case *EraseInDisplay:
+				evtHandler.ED(e.N)
+			case *EraseInLine:
+				evtHandler.EL(e.N)
+			case *InsertLine:
+				evtHandler.IL(e.N)
+			case *DeleteLine:
+				evtHandler.DL(e.N)
+			case *InsertCharacter:
+				evtHandler.ICH(e.N)
+			case *DeleteCharacter:
+				evtHandler.DCH(e.N)
+			case *SetGraphicsRendition:
+				evtHandler.SGR(e.Attr)
+			case *ScrollUp:
+				evtHandler.SU(e.N)
+			case *ScrollDown:
+				evtHandler.SD(e.N)
+			case *DeviceAttributes:
+				evtHandler.DA(e.Attributes)
+			case *SetTopAndBottomMargins:
+				evtHandler.DECSTBM(e.Top, e.Bottom)
+			case *Index:
+				evtHandler.IND()
+			case *ReverseIndex:
+				evtHandler.RI()
+			default:
+				// Handle unknown event types
+				ap.logf("Unknown event type: %T", e)
+			}
+
+			evtHandler.Flush()
+		}
+	}()
+
+	return ap
+}
+
+func CreateParser(eventChan chan<- AnsiEvent, opts ...Option) *AnsiParser {
 	ap := &AnsiParser{
-		eventHandler: evtHandler,
+		eventChan:    eventChan,
 		context:      &ansiContext{},
 		initialState: "Ground",
 	}
@@ -93,11 +176,12 @@ func (ap *AnsiParser) Parse(bytes []byte) (int, error) {
 		}
 	}
 
-	return len(bytes), ap.eventHandler.Flush()
+	return len(bytes), nil
 }
 
 func (ap *AnsiParser) handle(b byte) error {
-	ap.context.currentChar = b
+	ap.logf("AnsiParser handle: %c %x", b, b)
+	ap.context.CollectCurrentChar(b)
 	newState, err := ap.currState.Handle(b)
 	if err != nil {
 		return err

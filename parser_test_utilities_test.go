@@ -1,12 +1,13 @@
 package ansiterm
 
 import (
+	"context"
 	"testing"
 )
 
-func createTestParser(s string) (*AnsiParser, *TestAnsiEventHandler) {
+func createTestParser(ctx context.Context, s string) (*AnsiParser, *TestAnsiEventHandler) {
 	evtHandler := CreateTestAnsiEventHandler()
-	parser := CreateParserEventHandler(evtHandler, WithInitialState(s))
+	parser := CreateParserEventHandler(ctx, evtHandler, WithInitialState(s))
 
 	return parser, evtHandler
 }
@@ -44,17 +45,22 @@ func validateFuncCalls(t *testing.T, actualCalls []string, expectedCalls []strin
 }
 
 func fillContext(context *ansiContext) {
-	context.currentChar = 'A'
-	context.paramBuffer = []byte{'C', 'D', 'E'}
+	context.CollectCurrentChar('C')
+	context.CurCharToParamBuffer()
+	context.CollectCurrentChar('D')
+	context.CurCharToParamBuffer()
+	context.CollectCurrentChar('E')
+	context.CurCharToParamBuffer()
+	context.CollectCurrentChar('A')
 }
 
 func validateEmptyContext(t *testing.T, context *ansiContext) {
 	var expectedCurrChar byte = 0x0
-	if context.currentChar != expectedCurrChar {
-		t.Errorf("Currentchar mismatch '%#x' != '%#x'", context.currentChar, expectedCurrChar)
+	if context.CurrentChar() != expectedCurrChar {
+		t.Errorf("Currentchar mismatch '%#x' != '%#x'", context.CurrentChar(), expectedCurrChar)
 	}
 
-	if len(context.paramBuffer) != 0 {
-		t.Errorf("Non-empty parameter buffer: %v", context.paramBuffer)
+	if len(context.ParamBuffer()) != 0 {
+		t.Errorf("Non-empty parameter buffer: %v", context.ParamBuffer())
 	}
 }

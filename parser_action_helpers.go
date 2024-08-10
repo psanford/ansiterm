@@ -31,7 +31,7 @@ func parseParams(bytes []byte) ([]string, error) {
 }
 
 func parseCmd(context ansiContext) (string, error) {
-	return string(context.currentChar), nil
+	return string(context.CurrentChar()), nil
 }
 
 func getInt(params []string, dflt int) int {
@@ -64,11 +64,23 @@ func getInts(params []string, minCount int, dflt int) []int {
 func (ap *AnsiParser) modeDispatch(param string, set bool) error {
 	switch param {
 	case "?3":
-		return ap.eventHandler.DECCOLM(set)
+		e := &ColumnMode{
+			raw:    ap.context.Raw(),
+			Enable: set,
+		}
+		ap.eventChan <- e
 	case "?6":
-		return ap.eventHandler.DECOM(set)
+		e := &OriginMode{
+			raw:    ap.context.Raw(),
+			Enable: set,
+		}
+		ap.eventChan <- e
 	case "?25":
-		return ap.eventHandler.DECTCEM(set)
+		e := &TextCursorEnableMode{
+			raw:    ap.context.Raw(),
+			Enable: set,
+		}
+		ap.eventChan <- e
 	}
 	return nil
 }

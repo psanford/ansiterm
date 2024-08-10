@@ -5,7 +5,7 @@ type groundState struct {
 }
 
 func (gs groundState) Handle(b byte) (s state, e error) {
-	gs.parser.context.currentChar = b
+	gs.parser.context.CollectCurrentChar(b)
 
 	nextState, err := gs.baseState.Handle(b)
 	if nextState != nil || err != nil {

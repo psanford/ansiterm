@@ -33,9 +33,9 @@ func (csiState csiEntryState) Transition(s state) error {
 		return csiState.parser.csiDispatch()
 	case csiState.parser.csiParam:
 		switch {
-		case sliceContains(csiParams, csiState.parser.context.currentChar):
+		case sliceContains(csiParams, csiState.parser.context.CurrentChar()):
 			csiState.parser.collectParam()
-		case sliceContains(intermeds, csiState.parser.context.currentChar):
+		case sliceContains(intermeds, csiState.parser.context.CurrentChar()):
 			csiState.parser.collectInter()
 		}
 	}
