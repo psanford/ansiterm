@@ -117,6 +117,21 @@ func TestPrint(t *testing.T) {
 	}
 }
 
+func TestExec(t *testing.T) {
+	parser, evtHandler := createTestParser("Ground")
+	execBytes := getExecuteBytes()
+	parser.Parse(execBytes)
+	validateState(t, parser.currState, "Ground")
+
+	for i, v := range execBytes {
+		expectedCall := fmt.Sprintf("Execute([%s])", string(v))
+		actualCall := evtHandler.FunctionCalls[i]
+		if actualCall != expectedCall {
+			t.Errorf("Actual != Expected: %v != %v at %d", actualCall, expectedCall, i)
+		}
+	}
+}
+
 func TestClear(t *testing.T) {
 	p, _ := createTestParser("Ground")
 	fillContext(p.context)

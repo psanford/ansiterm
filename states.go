@@ -46,19 +46,6 @@ func (base baseState) Name() string {
 }
 
 func (base baseState) Transition(s state) error {
-	if s == base.parser.ground {
-		execBytes := []byte{0x18}
-		execBytes = append(execBytes, 0x1A)
-		execBytes = append(execBytes, getByteRange(0x80, 0x8F)...)
-		execBytes = append(execBytes, getByteRange(0x91, 0x97)...)
-		execBytes = append(execBytes, 0x99)
-		execBytes = append(execBytes, 0x9A)
-
-		if sliceContains(execBytes, base.parser.context.currentChar) {
-			return base.parser.execute()
-		}
-	}
-
 	return nil
 }
 
