@@ -4,6 +4,12 @@ This is a fork of https://github.com/Azure/go-ansiterm.
 
 We are not maintaining backward compatibility with the upstream implementation.
 
+### Changes from upstream
+
+Use a channel/event based API instead of a callback API. This allows us to expose events that might not be fully supported in the parser itself. It also means we won't break any existing consumers handling those events if we decide to add specific support for them.
+
+Basic utf8 support. Currently the parser will attempt to return whole utf8 codepoints if it sees them.
+
 ## Original readme
 
 This is a cross platform Ansi Terminal Emulation library.  It reads a stream of Ansi characters and produces the appropriate function calls.  The results of the function calls are platform dependent.
