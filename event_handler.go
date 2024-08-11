@@ -2,7 +2,7 @@ package ansiterm
 
 type ansiEventHandler interface {
 	// Print
-	Print(b byte) error
+	Print(b []byte) error
 
 	// Execute C0 commands
 	Execute(b byte) error

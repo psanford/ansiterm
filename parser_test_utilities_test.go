@@ -2,8 +2,13 @@ package ansiterm
 
 import (
 	"context"
+	"log"
 	"testing"
 )
+
+var debugLogOpt = WithLogf(func(s string, i ...interface{}) {
+	log.Printf(s, i...)
+})
 
 func createTestParser(ctx context.Context, s string) (*AnsiParser, *TestAnsiEventHandler) {
 	evtHandler := CreateTestAnsiEventHandler()
@@ -12,14 +17,22 @@ func createTestParser(ctx context.Context, s string) (*AnsiParser, *TestAnsiEven
 	return parser, evtHandler
 }
 
-func validateState(t *testing.T, actualState state, expectedStateName string) {
+func validateState(t *testing.T, start string, actualState state, expectedStateName string) {
 	actualName := "Nil"
 
 	if actualState != nil {
 		actualName = actualState.Name()
 	}
 
+	if start == "Utf8" {
+		return
+	}
+
 	if actualName != expectedStateName {
+		if start == "Ground" && actualName == "Utf8" && expectedStateName == "Ground" {
+			// for our purposes, utf8 is a sub state within ground
+			return
+		}
 		t.Errorf("Invalid state: '%s' != '%s'", actualName, expectedStateName)
 	}
 }

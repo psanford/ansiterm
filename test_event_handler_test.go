@@ -4,11 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"sync"
 	"sync/atomic"
 	"time"
 )
 
 type TestAnsiEventHandler struct {
+	mu            sync.Mutex
 	FunctionCalls []string
 	Count         uint32
 }
@@ -32,12 +34,14 @@ func (h *TestAnsiEventHandler) waitForNCalls(callCount int, timeout time.Duratio
 }
 
 func (h *TestAnsiEventHandler) recordCall(call string, params []string) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
 	s := fmt.Sprintf("%s(%v)", call, params)
 	h.FunctionCalls = append(h.FunctionCalls, s)
 	atomic.AddUint32(&h.Count, 1)
 }
 
-func (h *TestAnsiEventHandler) Print(b byte) error {
+func (h *TestAnsiEventHandler) Print(b []byte) error {
 	h.recordCall("Print", []string{string(b)})
 	return nil
 }

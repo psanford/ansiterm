@@ -18,6 +18,7 @@ type AnsiParser struct {
 	error              state
 	ground             state
 	oscString          state
+	utf8State          state
 	stateMap           []state
 
 	initialState string
@@ -52,7 +53,7 @@ func createParserEventHandler(ctx context.Context, evtHandler ansiEventHandler, 
 
 			switch e := evt.(type) {
 			case *Print:
-				evtHandler.Print(e.B[0])
+				evtHandler.Print(e.B)
 			case *Execute:
 				evtHandler.Execute(e.B[0])
 			case *CursorUp:
@@ -141,6 +142,7 @@ func CreateParser(eventChan chan<- AnsiEvent, opts ...Option) *AnsiParser {
 	ap.error = errorState{baseState{name: "Error", parser: ap}}
 	ap.ground = groundState{baseState{name: "Ground", parser: ap}}
 	ap.oscString = oscStringState{baseState{name: "OscString", parser: ap}}
+	ap.utf8State = utf8State{baseState{name: "Utf8", parser: ap}}
 
 	ap.stateMap = []state{
 		ap.csiEntry,
@@ -151,6 +153,7 @@ func CreateParser(eventChan chan<- AnsiEvent, opts ...Option) *AnsiParser {
 		ap.error,
 		ap.ground,
 		ap.oscString,
+		ap.utf8State,
 	}
 
 	ap.currState = getState(ap.initialState, ap.stateMap)
@@ -180,9 +183,11 @@ func (ap *AnsiParser) Parse(bytes []byte) (int, error) {
 }
 
 func (ap *AnsiParser) handle(b byte) error {
+	ap.logf("AnsiParser handle: <%#02x> curstate=%s", b, ap.currState.Name())
 	ap.context.CollectCurrentChar(b)
 	newState, err := ap.currState.Handle(b)
 	if err != nil {
+		ap.logf("currState %s handle err: %s", ap.currState.Name(), err)
 		return err
 	}
 
@@ -190,6 +195,7 @@ func (ap *AnsiParser) handle(b byte) error {
 		ap.logf("WARNING: newState is nil")
 		return errors.New("New state of 'nil' is invalid.")
 	}
+	ap.logf("newstate %s", newState.Name())
 
 	if newState != ap.currState {
 		if err := ap.changeState(newState); err != nil {

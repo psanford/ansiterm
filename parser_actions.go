@@ -240,9 +240,11 @@ func (ap *AnsiParser) csiDispatch() error {
 }
 
 func (ap *AnsiParser) print() error {
+	out := ap.context.ParamBuffer()
+	out = append(out, ap.context.CurrentChar())
 	e := &Print{
 		raw: ap.context.Raw(),
-		B:   []byte{ap.context.CurrentChar()},
+		B:   out,
 	}
 	ap.emit(e)
 	return nil

@@ -27,7 +27,7 @@ func stateTransitionHelper(t *testing.T, start string, end string, bytes []byte)
 		bytes := []byte{byte(b)}
 		parser, _ := createTestParser(ctx, start)
 		parser.Parse(bytes)
-		validateState(t, parser.currState, end)
+		validateState(t, start, parser.currState, end)
 	}
 }
 
@@ -43,7 +43,7 @@ func funcCallParamHelper(t *testing.T, bytes []byte, start string, expected stri
 
 	parser, evtHandler := createTestParser(ctx, start)
 	parser.Parse(bytes)
-	validateState(t, parser.currState, expected)
+	validateState(t, start, parser.currState, expected)
 
 	err := evtHandler.waitForNCalls(1, 100*time.Millisecond)
 	if err != nil {
@@ -119,7 +119,7 @@ func clearOnStateChangeHelper(t *testing.T, start string, end string, bytes []by
 	p, _ := createTestParser(ctx, start)
 	fillContext(p.context)
 	p.Parse(bytes)
-	validateState(t, p.currState, end)
+	validateState(t, start, p.currState, end)
 	validateEmptyContext(t, p.context)
 }
 
@@ -128,6 +128,6 @@ func c0Helper(t *testing.T, bytes []byte, expectedState string, expectedCalls []
 	defer cancel()
 	parser, evtHandler := createTestParser(ctx, "Ground")
 	parser.Parse(bytes)
-	validateState(t, parser.currState, expectedState)
+	validateState(t, "Ground", parser.currState, expectedState)
 	validateFuncCalls(t, evtHandler.FunctionCalls, expectedCalls)
 }

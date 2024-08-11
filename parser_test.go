@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 	"time"
+	"unicode/utf8"
 )
 
 func TestStateTransitions(t *testing.T) {
@@ -112,7 +113,7 @@ func TestPrint(t *testing.T) {
 	defer cancel()
 	parser, evtHandler := createTestParser(ctx, "Ground")
 	parser.Parse(printables)
-	validateState(t, parser.currState, "Ground")
+	validateState(t, "Ground", parser.currState, "Ground")
 
 	err := evtHandler.waitForNCalls(len(printables), 100*time.Millisecond)
 	if err != nil {
@@ -128,13 +129,37 @@ func TestPrint(t *testing.T) {
 	}
 }
 
+func TestPrintUtf8(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	parser, evtHandler := createTestParser(ctx, "Ground")
+	utf8Str := "𝄞κόσμε𝄞"
+	parser.Parse([]byte(utf8Str))
+	validateState(t, "Ground", parser.currState, "Ground")
+
+	err := evtHandler.waitForNCalls(utf8.RuneCountInString(utf8Str), 100*time.Millisecond)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	i := 0
+	for _, v := range utf8Str {
+		expectedCall := fmt.Sprintf("Print([%s])", string(v))
+		actualCall := evtHandler.FunctionCalls[i]
+		if actualCall != expectedCall {
+			t.Errorf("Actual != Expected: %v != %v at %d", actualCall, expectedCall, i)
+		}
+		i++
+	}
+}
+
 func TestExec(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	parser, evtHandler := createTestParser(ctx, "Ground")
 	execBytes := getExecuteBytes()
 	parser.Parse(execBytes)
-	validateState(t, parser.currState, "Ground")
+	validateState(t, "Ground", parser.currState, "Ground")
 
 	err := evtHandler.waitForNCalls(len(execBytes), 100*time.Millisecond)
 	if err != nil {
