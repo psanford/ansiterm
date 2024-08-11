@@ -1,4 +1,4 @@
-# go-ansiterm
+# ansiterm - a Go ANSI terminal sequence parsing library
 
 This is a fork of https://github.com/Azure/go-ansiterm.
 
