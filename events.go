@@ -434,15 +434,15 @@ func (e *ReverseIndex) ParserState() ParserState {
 	return StateRI
 }
 
-// Generic in an event that we do not have a more specific state for
-type Generic struct {
+// generic in an event that we do not have a more specific state for
+type generic struct {
 	raw []byte
 }
 
-func (e *Generic) Raw() []byte {
+func (e *generic) Raw() []byte {
 	return e.raw
 }
 
-func (e *Generic) ParserState() ParserState {
+func (e *generic) ParserState() ParserState {
 	return StateGeneric
 }

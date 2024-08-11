@@ -35,7 +35,7 @@ func (ap *AnsiParser) escDispatch() error {
 		}
 		ap.emit(e)
 	default:
-		e := &Generic{
+		e := &generic{
 			raw: ap.context.Raw(),
 		}
 		ap.emit(e)
@@ -223,13 +223,13 @@ func (ap *AnsiParser) csiDispatch() error {
 			}
 			ap.emit(e)
 		} else {
-			e := &Generic{
+			e := &generic{
 				raw: ap.context.Raw(),
 			}
 			ap.emit(e)
 		}
 	default:
-		e := &Generic{
+		e := &generic{
 			raw: ap.context.Raw(),
 		}
 		ap.emit(e)
