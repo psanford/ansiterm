@@ -7,7 +7,7 @@ import (
 
 type AnsiParser struct {
 	currState          state
-	eventHandler       AnsiEventHandler
+	eventHandler       ansiEventHandler
 	eventChan          chan<- AnsiEvent
 	context            *ansiContext
 	csiEntry           state
@@ -38,7 +38,7 @@ func WithInitialState(s string) Option {
 	}
 }
 
-func CreateParserEventHandler(ctx context.Context, evtHandler AnsiEventHandler, opts ...Option) *AnsiParser {
+func createParserEventHandler(ctx context.Context, evtHandler ansiEventHandler, opts ...Option) *AnsiParser {
 	eventChan := make(chan AnsiEvent)
 	ap := CreateParser(eventChan, opts...)
 	go func() {

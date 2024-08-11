@@ -1,6 +1,6 @@
 package ansiterm
 
-type AnsiEventHandler interface {
+type ansiEventHandler interface {
 	// Print
 	Print(b byte) error
 
