@@ -2,43 +2,7 @@ package ansiterm
 
 type AnsiEvent interface {
 	Raw() []byte
-	ParserState() ParserState
 }
-
-type ParserState string
-
-const (
-	StatePrint   ParserState = "print"
-	StateExecute ParserState = "execute"
-	StateCUU     ParserState = "cuu"     // CUrsor Up
-	StateCUD     ParserState = "cud"     // CUrsor Down
-	StateCUF     ParserState = "cuf"     // CUrsor Forward
-	StateCUB     ParserState = "cub"     // CUrsor Backward
-	StateCNL     ParserState = "cnl"     // Cursor to Next Line
-	StateCPL     ParserState = "cpl"     // Cursor to Previous Line
-	StateCHA     ParserState = "cha"     // Cursor Horizontal position Absolute
-	StateVPA     ParserState = "vpa"     // Vertical line Position Absolute
-	StateCUP     ParserState = "cup"     // CUrsor Position
-	StateHVP     ParserState = "hvp"     // Horizontal and Vertical Position (depends on PUM)
-	StateDECTCEM ParserState = "dectcem" // Text Cursor Enable Mode
-	StateDECOM   ParserState = "decom"   // Origin Mode
-	StateDECCOLM ParserState = "deccolm" // 132 Column Mode
-	StateED      ParserState = "ed"      // Erase in Display
-	StateEL      ParserState = "el"      // Erase in Line
-	StateIL      ParserState = "il"      // Insert Line
-	StateDL      ParserState = "dl"      // Delete Line
-	StateICH     ParserState = "ich"     // Insert Character
-	StateDCH     ParserState = "dch"     // Delete Character
-	StateSGR     ParserState = "sgr"     // Set Graphics Rendition
-	StateSU      ParserState = "su"      // Pan Down
-	StateSD      ParserState = "sd"      // Pan Up
-	StateDA      ParserState = "da"      // Device Attributes
-	StateDECSTBM ParserState = "decstbm" // Set Top and Bottom Margins
-	StateIND     ParserState = "ind"     // Index
-	StateRI      ParserState = "ri"      // Reverse Index
-
-	StateGeneric ParserState = "generic"
-)
 
 // Print
 type Print struct {
@@ -48,10 +12,6 @@ type Print struct {
 
 func (e *Print) Raw() []byte {
 	return e.raw
-}
-
-func (e *Print) ParserState() ParserState {
-	return StatePrint
 }
 
 // Execute C0 commands.
@@ -65,10 +25,6 @@ func (e *Execute) Raw() []byte {
 	return e.raw
 }
 
-func (e *Execute) ParserState() ParserState {
-	return StateExecute
-}
-
 // CursorUp (CUU)
 type CursorUp struct {
 	raw []byte
@@ -77,10 +33,6 @@ type CursorUp struct {
 
 func (e *CursorUp) Raw() []byte {
 	return e.raw
-}
-
-func (e *CursorUp) ParserState() ParserState {
-	return StateCUU
 }
 
 // CursorDown (CUD)
@@ -93,10 +45,6 @@ func (e *CursorDown) Raw() []byte {
 	return e.raw
 }
 
-func (e *CursorDown) ParserState() ParserState {
-	return StateCUD
-}
-
 // CursorForward (CUF)
 type CursorForward struct {
 	raw []byte
@@ -105,10 +53,6 @@ type CursorForward struct {
 
 func (e *CursorForward) Raw() []byte {
 	return e.raw
-}
-
-func (e *CursorForward) ParserState() ParserState {
-	return StateCUF
 }
 
 // CursorBackward (CUB)
@@ -121,10 +65,6 @@ func (e *CursorBackward) Raw() []byte {
 	return e.raw
 }
 
-func (e *CursorBackward) ParserState() ParserState {
-	return StateCUB
-}
-
 // CursorNextLine (CNL)
 type CursorNextLine struct {
 	raw []byte
@@ -133,10 +73,6 @@ type CursorNextLine struct {
 
 func (e *CursorNextLine) Raw() []byte {
 	return e.raw
-}
-
-func (e *CursorNextLine) ParserState() ParserState {
-	return StateCNL
 }
 
 // CursorPreviousLine (CPL)
@@ -149,10 +85,6 @@ func (e *CursorPreviousLine) Raw() []byte {
 	return e.raw
 }
 
-func (e *CursorPreviousLine) ParserState() ParserState {
-	return StateCPL
-}
-
 // CursorHorizontalAbsolute (CHA)
 type CursorHorizontalAbsolute struct {
 	raw []byte
@@ -163,10 +95,6 @@ func (e *CursorHorizontalAbsolute) Raw() []byte {
 	return e.raw
 }
 
-func (e *CursorHorizontalAbsolute) ParserState() ParserState {
-	return StateCHA
-}
-
 // VerticalLinePositionAbsolute (VPA)
 type VerticalLinePositionAbsolute struct {
 	raw []byte
@@ -175,10 +103,6 @@ type VerticalLinePositionAbsolute struct {
 
 func (e *VerticalLinePositionAbsolute) Raw() []byte {
 	return e.raw
-}
-
-func (e *VerticalLinePositionAbsolute) ParserState() ParserState {
-	return StateVPA
 }
 
 // CursorPosition (CUP)
@@ -192,10 +116,6 @@ func (e *CursorPosition) Raw() []byte {
 	return e.raw
 }
 
-func (e *CursorPosition) ParserState() ParserState {
-	return StateCUP
-}
-
 // HorizontalVerticalPosition (HVP)
 type HorizontalVerticalPosition struct {
 	raw []byte
@@ -205,10 +125,6 @@ type HorizontalVerticalPosition struct {
 
 func (e *HorizontalVerticalPosition) Raw() []byte {
 	return e.raw
-}
-
-func (e *HorizontalVerticalPosition) ParserState() ParserState {
-	return StateHVP
 }
 
 // TextCursorEnableMode (DECTCEM)
@@ -221,10 +137,6 @@ func (e *TextCursorEnableMode) Raw() []byte {
 	return e.raw
 }
 
-func (e *TextCursorEnableMode) ParserState() ParserState {
-	return StateDECTCEM
-}
-
 // OriginMode (DECOM)
 type OriginMode struct {
 	raw    []byte
@@ -233,10 +145,6 @@ type OriginMode struct {
 
 func (e *OriginMode) Raw() []byte {
 	return e.raw
-}
-
-func (e *OriginMode) ParserState() ParserState {
-	return StateDECOM
 }
 
 // ColumnMode (DECCOLM)
@@ -249,10 +157,6 @@ func (e *ColumnMode) Raw() []byte {
 	return e.raw
 }
 
-func (e *ColumnMode) ParserState() ParserState {
-	return StateDECCOLM
-}
-
 // EraseInDisplay (ED)
 type EraseInDisplay struct {
 	raw []byte
@@ -261,10 +165,6 @@ type EraseInDisplay struct {
 
 func (e *EraseInDisplay) Raw() []byte {
 	return e.raw
-}
-
-func (e *EraseInDisplay) ParserState() ParserState {
-	return StateED
 }
 
 // EraseInLine (EL)
@@ -277,10 +177,6 @@ func (e *EraseInLine) Raw() []byte {
 	return e.raw
 }
 
-func (e *EraseInLine) ParserState() ParserState {
-	return StateEL
-}
-
 // InsertLine (IL)
 type InsertLine struct {
 	raw []byte
@@ -289,10 +185,6 @@ type InsertLine struct {
 
 func (e *InsertLine) Raw() []byte {
 	return e.raw
-}
-
-func (e *InsertLine) ParserState() ParserState {
-	return StateIL
 }
 
 // DeleteLine (DL)
@@ -305,10 +197,6 @@ func (e *DeleteLine) Raw() []byte {
 	return e.raw
 }
 
-func (e *DeleteLine) ParserState() ParserState {
-	return StateDL
-}
-
 // InsertCharacter (ICH)
 type InsertCharacter struct {
 	raw []byte
@@ -317,10 +205,6 @@ type InsertCharacter struct {
 
 func (e *InsertCharacter) Raw() []byte {
 	return e.raw
-}
-
-func (e *InsertCharacter) ParserState() ParserState {
-	return StateICH
 }
 
 // DeleteCharacter (DCH)
@@ -333,10 +217,6 @@ func (e *DeleteCharacter) Raw() []byte {
 	return e.raw
 }
 
-func (e *DeleteCharacter) ParserState() ParserState {
-	return StateDCH
-}
-
 // SetGraphicsRendition (SGR)
 type SetGraphicsRendition struct {
 	raw  []byte
@@ -345,10 +225,6 @@ type SetGraphicsRendition struct {
 
 func (e *SetGraphicsRendition) Raw() []byte {
 	return e.raw
-}
-
-func (e *SetGraphicsRendition) ParserState() ParserState {
-	return StateSGR
 }
 
 // ScrollUp (SU)
@@ -361,10 +237,6 @@ func (e *ScrollUp) Raw() []byte {
 	return e.raw
 }
 
-func (e *ScrollUp) ParserState() ParserState {
-	return StateSU
-}
-
 // ScrollDown (SD)
 type ScrollDown struct {
 	raw []byte
@@ -375,10 +247,6 @@ func (e *ScrollDown) Raw() []byte {
 	return e.raw
 }
 
-func (e *ScrollDown) ParserState() ParserState {
-	return StateSD
-}
-
 // DeviceAttributes (DA)
 type DeviceAttributes struct {
 	raw        []byte
@@ -387,10 +255,6 @@ type DeviceAttributes struct {
 
 func (e *DeviceAttributes) Raw() []byte {
 	return e.raw
-}
-
-func (e *DeviceAttributes) ParserState() ParserState {
-	return StateDA
 }
 
 // SetTopAndBottomMargins (DECSTBM)
@@ -404,10 +268,6 @@ func (e *SetTopAndBottomMargins) Raw() []byte {
 	return e.raw
 }
 
-func (e *SetTopAndBottomMargins) ParserState() ParserState {
-	return StateDECSTBM
-}
-
 // Index (IND)
 type Index struct {
 	raw []byte
@@ -415,10 +275,6 @@ type Index struct {
 
 func (e *Index) Raw() []byte {
 	return e.raw
-}
-
-func (e *Index) ParserState() ParserState {
-	return StateIND
 }
 
 // ReverseIndex (RI)
@@ -430,10 +286,6 @@ func (e *ReverseIndex) Raw() []byte {
 	return e.raw
 }
 
-func (e *ReverseIndex) ParserState() ParserState {
-	return StateRI
-}
-
 // generic in an event that we do not have a more specific state for
 type generic struct {
 	raw []byte
@@ -441,8 +293,4 @@ type generic struct {
 
 func (e *generic) Raw() []byte {
 	return e.raw
-}
-
-func (e *generic) ParserState() ParserState {
-	return StateGeneric
 }
